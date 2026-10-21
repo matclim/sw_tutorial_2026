@@ -73,8 +73,14 @@ CANDIDATES = {
 # Check:    pixi cvmfs check-task 1
 # ===========================================================================
 def open_file(path, ntuple_name=NTUPLE_NAME):
+    '''open input file from path and return a ROOT.RNTupleReader on the ntuple'''
     # ---- TASK 1: your code below (delete the "raise" line) ----------------
-    raise NotImplementedError("task 1: open_file")
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"task 1: open_file: file {path} does not exist")
+    myreader = ROOT.RNTupleReader.Open(ntuple_name, path)
+    print(f"task 1: open_file: {myreader.GetNEntries()} entries in {path}/{ntuple_name}")
+    myreader.PrintInfo()
+    return myreader
     # ---- TASK 1: your code above -------------------------------------------
 
 
