@@ -198,7 +198,7 @@ def make_model(h_mystery):
 
 
 # ===========================================================================
-# TASK 7 -- Fit                                             owner: __________
+# TASK 7 -- Fit                                             owner: Kathi
 # ---------------------------------------------------------------------------
 # Input:    h_mystery    (ROOT.TH1F) filled histogram from task 5
 #           f_func       (ROOT.TF1) model with starting values from task 6
@@ -217,7 +217,11 @@ def make_model(h_mystery):
 # ===========================================================================
 def fit_model(h_mystery, f_func):
     # ---- TASK 7: your code below (delete the "raise" line) ----------------
-    raise NotImplementedError("task 7: fit_model")
+    fit_result = h_mystery.Fit(f_func,"SRLQ0")
+    if fit_result.Status() == 0:
+        return fit_result
+    else:
+        raise RuntimeError("fit did not converge")
     # ---- TASK 7: your code above -------------------------------------------
 
 
