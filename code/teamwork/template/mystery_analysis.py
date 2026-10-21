@@ -151,7 +151,7 @@ def book_histogram(stats):
 
 
 # ===========================================================================
-# TASK 5 -- Fill the histogram                              owner: __________
+# TASK 5 -- Fill the histogram                              owner: Jasmin
 # ---------------------------------------------------------------------------
 # Input:    h_mystery    (ROOT.TH1F) empty histogram from task 4
 #           masses       (list of float) from task 2
@@ -165,13 +165,23 @@ def book_histogram(stats):
 # Check:    pixi cvmfs check-task 5
 # ===========================================================================
 def fill_histogram(h_mystery, masses):
-    # ---- TASK 5: your code below (delete the "raise" line) ----------------
-    raise NotImplementedError("task 5: fill_histogram")
+    for mass in masses:
+        h_mystery.Fill(mass)
+    entries = h_mystery.GetEntries()
+    underflow = h_mystery.GetBinContent(0)
+    overflow = h_mystery.GetBinContent(h_mystery.GetNbinsX() + 1)
+    print(f"Filled {entries} entries: {underflow} underflow, {overflow} overflow")
+
+    if underflow + overflow > 0.05 * entries:
+        print("Warning: more than 5% of the values are outside the histogram range; "
+              "consider changing the range in task 4.")
+
+    return h_mystery
     # ---- TASK 5: your code above -------------------------------------------
 
 
 # ===========================================================================
-# TASK 6 -- Build the fit model                             owner: __________
+# TASK 6 -- Build the fit model                             owner: Jasmin
 # ---------------------------------------------------------------------------
 # Input:    h_mystery    (ROOT.TH1F) filled histogram from task 5
 # Output:   f_func       (ROOT.TF1) named "f_func", NOT yet fitted, with
@@ -193,12 +203,24 @@ def fill_histogram(h_mystery, masses):
 # ===========================================================================
 def make_model(h_mystery):
     # ---- TASK 6: your code below (delete the "raise" line) ----------------
-    raise NotImplementedError("task 6: make_model")
+    axis_min = h_mystery.GetXaxis().GetXmin()
+    axis_max = h_mystery.GetXaxis().GetXmax()
+    f_func = ROOT.TF1("f_func", "[0]*TMath::BreitWigner(x, [1], [2])", axis_min, axis_max)
+    Mass = h_mystery.GetBinCenter(h_mystery.GetMaximumBin())
+    half_max = h_mystery.GetMaximum() / 2
+    first = h_mystery.FindFirstBinAbove(half_max)
+    last = h_mystery.FindLastBinAbove(half_max)
+    Width = h_mystery.GetBinCenter(last) - h_mystery.GetBinCenter(first)
+    Width = max(Width, h_mystery.GetBinWidth(1))  # avoid 0 if the peak is only one bin wide
+    Normalization = h_mystery.Integral() * h_mystery.GetBinWidth(1)
+    f_func.SetParameters(Normalization, Mass, Width)
+    f_func.SetParNames("N", "M", "#Gamma")
+    return f_func
     # ---- TASK 6: your code above -------------------------------------------
 
 
 # ===========================================================================
-# TASK 7 -- Fit                                             owner: __________
+# TASK 7 -- Fit                                             owner: Jasmin
 # ---------------------------------------------------------------------------
 # Input:    h_mystery    (ROOT.TH1F) filled histogram from task 5
 #           f_func       (ROOT.TF1) model with starting values from task 6
