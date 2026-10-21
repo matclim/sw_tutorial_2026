@@ -99,7 +99,8 @@ def open_file(path, ntuple_name=NTUPLE_NAME):
 # ===========================================================================
 def read_masses(reader, field_name=FIELD_NAME):
     # ---- TASK 2: your code below (delete the "raise" line) ----------------
-    raise NotImplementedError("task 2: read_masses")
+    view = reader.GetView["float"](field_name)
+    return [float(view(entry)) for entry in range(reader.GetNEntries())]
     # ---- TASK 2: your code above -------------------------------------------
 
 
